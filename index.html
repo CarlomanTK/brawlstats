@@ -84,7 +84,7 @@
   }
 
   async function fetchPlayer(tag) {
-    const encodedTag = encodeURIComponent("#" + tag);
+    const encodedTag = encodeURIComponent("%23" + tag);
     const url = `https://api.brawlstars.com/v1/players/${encodedTag}`;
     try {
       const res = await fetch(url, {
