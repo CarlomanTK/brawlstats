@@ -1,92 +1,154 @@
-﻿<!DOCTYPE html>
-<html lang='fr'>
+<!DOCTYPE html>
+<html lang="fr">
 <head>
-<meta charset='UTF-8'>
-<title>Stats Brawl Stars</title>
-<style>
-  body { font-family: Arial, sans-serif; margin: 20px; }
-  table { border-collapse: collapse; width: 100%; margin-bottom: 30px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-  th { background-color: #f2f2f2; }
-  caption { font-weight: bold; margin-bottom: 8px; }
-</style>
+  <meta charset="UTF-8">
+  <title>Stats Brawl Stars</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f8f8; }
+    header { background: #222; color: white; padding: 10px 20px; border-radius: 8px; }
+    .player-links a {
+      margin: 0 10px;
+      color: #00bfff;
+      text-decoration: none;
+    }
+    .player-links a:hover { text-decoration: underline; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th { background-color: #eee; }
+    .totals { font-weight: bold; background: #ddd; }
+  </style>
 </head>
 <body>
-<h1>Stats Brawl Stars au 20250724</h1>
 
-<h2>1) Stats journalières par mode</h2>
-<table>
-<caption>Statistiques des parties normales du jour</caption>
-<tr>
-  <th>Mode de jeu</th><th>Nombre de parties</th><th>Victoires</th><th>% Victoires</th><th>Total trophées gagnés</th>
-</tr>
-<tr><td>Tous modes</td><td>0</td><td>0</td><td>0%</td><td></td></tr>
-<tr><td>soloShowdown</td><td>0</td><td>0</td><td>0%</td><td></td></tr>
-<tr><td>duoShowdown</td><td>0</td><td>0</td><td>0%</td><td></td></tr>
-<tr><td>trioShowdown</td><td>0</td><td>0</td><td>0%</td><td></td></tr>
-<tr><td>Autres modes Trio</td><td>0</td><td>0</td><td>0%</td><td></td></tr>
+<header>
+  <h1>Stats des joueurs Brawl Stars</h1>
+  <div class="player-links" id="player-links">
+    <!-- Tags de joueurs (liens) -->
+  </div>
+</header>
+
+<table id="players-table">
+  <thead>
+    <tr>
+      <th>Nom</th>
+      <th>Tag</th>
+      <th>Trophées</th>
+      <th>Trophées Max</th>
+      <th>Victoire 3v3</th>
+      <th>Solo</th>
+      <th>Duo</th>
+      <th>Club</th>
+      <th>Brawlers</th>
+      <th>Brawlers lvl 11</th>
+      <th>Gears</th>
+      <th>Star Powers</th>
+      <th>Gadgets</th>
+    </tr>
+  </thead>
+  <tbody id="table-body"></tbody>
+  <tfoot>
+    <tr class="totals">
+      <td colspan="8">Totaux</td>
+      <td id="total-brawlers">0</td>
+      <td id="total-lvl11">0</td>
+      <td id="total-gears">0</td>
+      <td id="total-sp">0</td>
+      <td id="total-gadgets">0</td>
+    </tr>
+  </tfoot>
 </table>
 
-<h2>2) Stats journalières classé</h2>
-<table>
-<caption>Statistiques Classé du jour</caption>
-<tr><th>Mode</th><th>Nombre de parties</th><th>Victoires</th><th>% Victoires</th><th>Joueurs Star</th><th>% Joueurs Star</th></tr>
-<tr><td>Tous modes</td><td>15</td><td>11</td><td>73.33%</td><td>7</td><td>46.67%</td></tr><tr><td>bounty</td><td>1</td><td>0</td><td>0%</td><td>0</td><td>0%</td></tr>
-<tr><td>heist</td><td>8</td><td>8</td><td>100%</td><td>6</td><td>75%</td></tr>
-<tr><td>gemGrab</td><td>2</td><td>2</td><td>100%</td><td>0</td><td>0%</td></tr>
-<tr><td>knockout</td><td>2</td><td>0</td><td>0%</td><td></td><td>0%</td></tr>
-<tr><td>brawlBall</td><td>2</td><td></td><td>0%</td><td>0</td><td>0%</td></tr>
-</table>
+<script>
+  const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImExODQ1YmQyLTliYjYtNDZmNS1hMmJkLTZmMzUxNzdlN2VlMSIsImlhdCI6MTc1MDM1MDgxNywic3ViIjoiZGV2ZWxvcGVyLzcxYThkYzRlLTc0YTQtN2QyNi04YzM4LWJlZjM2NjhiN2ZkNyIsInNjb3BlcyI6WyJicmF3bHN0YXJzIl0sImxpbWl0cyI6W3sidGllciI6ImRldmVsb3Blci9zaWx2ZXIiLCJ0eXBlIjoidGhyb3R0bGluZyJ9LHsiY2lkcnMiOlsiODguMTY0LjYzLjE5NiIsIjc4LjExMi40OC40OCIsIjkyLjE1NC4xMDQuMTgxIl0sInR5cGUiOiJjbGllbnQifV19.Cph-PY8XIfGiXwgOHSewhwYAc_lt1qOJ_9v11uDnfT6PPCUHWC6kdBY5-hLJcT5OR9I83Uhu7-j0lb7u9uc07Q";
+  const playerTags = ["9C0PR00G", "20UJ80CUV", "9YPLYLQYR"]; // ← Ajoute ici d'autres tags si besoin
+  const tableBody = document.getElementById("table-body");
+  const playerLinksDiv = document.getElementById("player-links");
 
-<h2>3) Stats globales par mode (toutes données)</h2>
-<table>
-<caption>Statistiques ranked globales</caption>
-<tr>
-  <th>Mode de jeu</th><th>Nombre de parties</th><th>Victoires</th><th>% Victoires</th><th>Total trophées gagnés</th>
-</tr>
-<tr><td>Tous modes</td><td>25</td><td>17</td><td>68%</td><td>143</td></tr>
-<tr><td>soloShowdown</td><td>0</td><td>0</td><td>0%</td><td></td></tr>
-<tr><td>duoShowdown</td><td>0</td><td>0</td><td>0%</td><td></td></tr>
-<tr><td>trioShowdown</td><td>25</td><td>17</td><td>68%</td><td>143</td></tr>
-<tr><td>Autres modes Trio</td><td>0</td><td>0</td><td>0%</td><td></td></tr>
-</table>
+  let totals = {
+    brawlers: 0,
+    lvl11: 0,
+    gears: 0,
+    sp: 0,
+    gadgets: 0
+  };
 
-<h2>4) Stats classé (toutes données)</h2>
-<table>
-<caption>Statistiques soloRanked globales</caption>
-<tr><th>Mode</th><th>Nombre de parties</th><th>Victoires</th><th>% Victoires</th><th>Joueurs Star</th><th>% Joueurs Star</th></tr>
-<tr><td>Tous les modes</td><td>15</td><td>11</td><td>73.33%</td><td>7</td><td>46.67%</td></tr><tr><td>bounty</td><td>1</td><td>0</td><td>0%</td><td>0</td><td>0%</td></tr>
-<tr><td>heist</td><td>8</td><td>8</td><td>100%</td><td>6</td><td>75%</td></tr>
-<tr><td>gemGrab</td><td>2</td><td>2</td><td>100%</td><td>0</td><td>0%</td></tr>
-<tr><td>knockout</td><td>2</td><td>0</td><td>0%</td><td></td><td>0%</td></tr>
-<tr><td>brawlBall</td><td>2</td><td></td><td>0%</td><td>0</td><td>0%</td></tr>
-</table>
+  function addLink(tag) {
+    const a = document.createElement('a');
+    a.href = "pages/" + tag.replace("#", "") + ".html";
+    a.textContent = tag;
+    playerLinksDiv.appendChild(a);
+  }
 
-<h2>5) Stats Brawlers journalières</h2>
-<table>
-<caption>Nombre de parties, victoires et % victoires par Brawler - Jour 20250724</caption>
-<tr><th>Brawler</th><th>Nombre de parties</th><th>Victoires</th><th>% Victoires</th></tr><tr><td>BYRON</td><td>2</td><td>0</td><td>0%</td></tr>
-<tr><td>JESSIE</td><td>3</td><td>3</td><td>100%</td></tr>
-<tr><td>BELLE</td><td>1</td><td></td><td>0%</td></tr>
-<tr><td>TICK</td><td>2</td><td></td><td>0%</td></tr>
-<tr><td>PENNY</td><td>4</td><td>4</td><td>100%</td></tr>
-<tr><td>SANDY</td><td>2</td><td></td><td>0%</td></tr>
-<tr><td>MICO</td><td>1</td><td></td><td>0%</td></tr>
-</table>
+  async function fetchPlayer(tag) {
+    const encodedTag = encodeURIComponent("%23" + tag);
+    const res = await fetch(`https://api.brawlstars.com/v1/players/${encodedTag}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    if (!res.ok) {
+      console.error(`Erreur pour ${tag}`);
+      return;
+    }
+    const data = await res.json();
+    displayPlayer(data);
+  }
 
-<h2>6) Stats Brawlers (toutes données)</h2>
-<table>
-<caption>Nombre de parties, victoires et % victoires par Brawler - Toutes données</caption>
-<tr><th>Brawler</th><th>Nombre de parties</th><th>Victoires</th><th>% Victoires</th></tr><tr><td>CLANCY</td><td>14</td><td>8</td><td>57.14%</td></tr>
-<tr><td>BERRY</td><td>11</td><td>9</td><td>81.82%</td></tr>
-<tr><td>BYRON</td><td>2</td><td>0</td><td>0%</td></tr>
-<tr><td>JESSIE</td><td>3</td><td>3</td><td>100%</td></tr>
-<tr><td>BELLE</td><td>1</td><td></td><td>0%</td></tr>
-<tr><td>TICK</td><td>2</td><td></td><td>0%</td></tr>
-<tr><td>PENNY</td><td>4</td><td>4</td><td>100%</td></tr>
-<tr><td>SANDY</td><td>2</td><td></td><td>0%</td></tr>
-<tr><td>MICO</td><td>1</td><td></td><td>0%</td></tr>
-</table>
+  function displayPlayer(p) {
+    const brawlers = p.brawlers || [];
+    const brawlerCount = brawlers.length;
+    const lvl11Count = brawlers.filter(b => b.power === 11).length;
+    const gearCount = brawlers.reduce((sum, b) => sum + (b.gears?.length || 0), 0);
+    const spCount = brawlers.reduce((sum, b) => sum + (b.starPowers?.length || 0), 0);
+    const gadgetCount = brawlers.reduce((sum, b) => sum + (b.gadgets?.length || 0), 0);
+
+    totals.brawlers += brawlerCount;
+    totals.lvl11 += lvl11Count;
+    totals.gears += gearCount;
+    totals.sp += spCount;
+    totals.gadgets += gadgetCount;
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${p.name}</td>
+      <td>${p.tag}</td>
+      <td>${p.trophies}</td>
+      <td>${p.highestTrophies}</td>
+      <td>${p["3vs3Victories"]}</td>
+      <td>${p.soloVictories}</td>
+      <td>${p.duoVictories}</td>
+      <td>${p.club?.name || "-"}</td>
+      <td>${brawlerCount}</td>
+      <td>${lvl11Count}</td>
+      <td>${gearCount}</td>
+      <td>${spCount}</td>
+      <td>${gadgetCount}</td>
+    `;
+    tableBody.appendChild(row);
+
+    // Update total footer
+    document.getElementById("total-brawlers").textContent = totals.brawlers;
+    document.getElementById("total-lvl11").textContent = totals.lvl11;
+    document.getElementById("total-gears").textContent = totals.gears;
+    document.getElementById("total-sp").textContent = totals.sp;
+    document.getElementById("total-gadgets").textContent = totals.gadgets;
+  }
+
+  // Init
+  playerTags.forEach(tag => {
+    addLink("#" + tag);
+    fetchPlayer(tag);
+  });
+</script>
 
 </body>
 </html>
