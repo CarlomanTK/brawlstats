@@ -4,14 +4,26 @@
   <meta charset="UTF-8">
   <title>Stats Brawl Stars</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f8f8; }
-    header { background: #222; color: white; padding: 10px 20px; border-radius: 8px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    header {
+      background: #222;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+    }
     .player-links a {
       margin: 0 10px;
       color: #00bfff;
       text-decoration: none;
     }
-    .player-links a:hover { text-decoration: underline; }
+    .player-links a:hover {
+      text-decoration: underline;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -19,103 +31,86 @@
       background: white;
     }
     th, td {
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
       padding: 8px;
       text-align: center;
     }
-    th { background-color: #eee; }
-    .totals { font-weight: bold; background: #ddd; }
+    th {
+      background: #eee;
+    }
   </style>
 </head>
 <body>
 
 <header>
   <h1>Stats des joueurs Brawl Stars</h1>
-  <div class="player-links" id="player-links">
-    <!-- Tags de joueurs (liens) -->
-  </div>
+  <div class="player-links" id="player-links"></div>
 </header>
 
-<table id="players-table">
+<table>
   <thead>
     <tr>
       <th>Nom</th>
       <th>Tag</th>
       <th>Trophées</th>
-      <th>Trophées Max</th>
+      <th>Trophées max</th>
       <th>Victoire 3v3</th>
       <th>Solo</th>
       <th>Duo</th>
       <th>Club</th>
-      <th>Brawlers</th>
+      <th># Brawlers</th>
       <th>Brawlers lvl 11</th>
       <th>Gears</th>
       <th>Star Powers</th>
       <th>Gadgets</th>
     </tr>
   </thead>
-  <tbody id="table-body"></tbody>
-  <tfoot>
-    <tr class="totals">
-      <td colspan="8">Totaux</td>
-      <td id="total-brawlers">0</td>
-      <td id="total-lvl11">0</td>
-      <td id="total-gears">0</td>
-      <td id="total-sp">0</td>
-      <td id="total-gadgets">0</td>
-    </tr>
-  </tfoot>
+  <tbody id="table-body">
+    <!-- Les lignes seront générées ici -->
+  </tbody>
 </table>
 
 <script>
   const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImExODQ1YmQyLTliYjYtNDZmNS1hMmJkLTZmMzUxNzdlN2VlMSIsImlhdCI6MTc1MDM1MDgxNywic3ViIjoiZGV2ZWxvcGVyLzcxYThkYzRlLTc0YTQtN2QyNi04YzM4LWJlZjM2NjhiN2ZkNyIsInNjb3BlcyI6WyJicmF3bHN0YXJzIl0sImxpbWl0cyI6W3sidGllciI6ImRldmVsb3Blci9zaWx2ZXIiLCJ0eXBlIjoidGhyb3R0bGluZyJ9LHsiY2lkcnMiOlsiODguMTY0LjYzLjE5NiIsIjc4LjExMi40OC40OCIsIjkyLjE1NC4xMDQuMTgxIl0sInR5cGUiOiJjbGllbnQifV19.Cph-PY8XIfGiXwgOHSewhwYAc_lt1qOJ_9v11uDnfT6PPCUHWC6kdBY5-hLJcT5OR9I83Uhu7-j0lb7u9uc07Q";
-  const playerTags = ["9C0PR00G", "20UJ80CUV", "9YPLYLQYR"]; // ← Ajoute ici d'autres tags si besoin
+  const playerTags = ["9C0PR00G", "20UJ80CUV", "9YPLYLQYR"];
   const tableBody = document.getElementById("table-body");
   const playerLinksDiv = document.getElementById("player-links");
 
-  let totals = {
-    brawlers: 0,
-    lvl11: 0,
-    gears: 0,
-    sp: 0,
-    gadgets: 0
-  };
-
   function addLink(tag) {
-    const a = document.createElement('a');
-    a.href = "pages/" + tag.replace("#", "") + ".html";
-    a.textContent = tag;
-    playerLinksDiv.appendChild(a);
+    const link = document.createElement('a');
+    link.href = `joueurs/${tag}.html`;
+    link.textContent = "#" + tag;
+    playerLinksDiv.appendChild(link);
   }
 
   async function fetchPlayer(tag) {
-    const encodedTag = encodeURIComponent("%23" + tag);
-    const res = await fetch(`https://api.brawlstars.com/v1/players/${encodedTag}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
+    const encodedTag = encodeURIComponent("#" + tag);
+    const url = `https://api.brawlstars.com/v1/players/${encodedTag}`;
+    try {
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (!res.ok) {
+        console.error("Erreur pour", tag, res.status);
+        return;
       }
-    });
-    if (!res.ok) {
-      console.error(`Erreur pour ${tag}`);
-      return;
+      const data = await res.json();
+      displayPlayer(data);
+    } catch (err) {
+      console.error("Erreur réseau pour", tag, err);
     }
-    const data = await res.json();
-    displayPlayer(data);
   }
 
   function displayPlayer(p) {
     const brawlers = p.brawlers || [];
+
     const brawlerCount = brawlers.length;
     const lvl11Count = brawlers.filter(b => b.power === 11).length;
     const gearCount = brawlers.reduce((sum, b) => sum + (b.gears?.length || 0), 0);
     const spCount = brawlers.reduce((sum, b) => sum + (b.starPowers?.length || 0), 0);
     const gadgetCount = brawlers.reduce((sum, b) => sum + (b.gadgets?.length || 0), 0);
-
-    totals.brawlers += brawlerCount;
-    totals.lvl11 += lvl11Count;
-    totals.gears += gearCount;
-    totals.sp += spCount;
-    totals.gadgets += gadgetCount;
 
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -134,18 +129,11 @@
       <td>${gadgetCount}</td>
     `;
     tableBody.appendChild(row);
-
-    // Update total footer
-    document.getElementById("total-brawlers").textContent = totals.brawlers;
-    document.getElementById("total-lvl11").textContent = totals.lvl11;
-    document.getElementById("total-gears").textContent = totals.gears;
-    document.getElementById("total-sp").textContent = totals.sp;
-    document.getElementById("total-gadgets").textContent = totals.gadgets;
   }
 
-  // Init
+  // Initialisation
   playerTags.forEach(tag => {
-    addLink("#" + tag);
+    addLink(tag);
     fetchPlayer(tag);
   });
 </script>
